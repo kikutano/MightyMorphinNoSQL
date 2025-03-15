@@ -1,4 +1,6 @@
-![logo](logo.png)
+<div style="text-align: center;">
+    <img src="logo.png" alt="Descrizione" width="320">
+</div>
 
 # MightyMorphinNoSQL
 This is a toy projects! The goal is to create a **NoSQL Database** from scratch, super light, without dependencies just for fun and learning. It's a good idea? No. So why? Why not?!
