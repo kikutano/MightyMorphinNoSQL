@@ -6,6 +6,12 @@
 This is a **toy projects!** The goal is to create a **NoSQL Database** from scratch, super light, without dependencies just for fun and learning. This database uses **Append-Only Log** paradigm. It's a good idea? No. So why? Why not?!
 
 ### File format:
+Header:
+```
+index_counter:1000001
+```
+
+Database:
 ```
 [id],[content]
 
