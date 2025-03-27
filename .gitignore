@@ -41,3 +41,6 @@ build/Debug/outDebug.exe
 .vs/MightyMorphinNoSQL/v17/Browse.VC.opendb
 
 .vs/MightyMorphinNoSQL/FileContentIndex/
+mydb_ids_indexes.db
+mydb.db
+.vs/MightyMorphinNoSQL/v17/DocumentLayout.backup.json
