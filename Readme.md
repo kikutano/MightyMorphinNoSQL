@@ -3,28 +3,12 @@
 </div>
 
 # MightyMorphinNoSQL
-This is a **toy projects!** The goal is to create a **NoSQL Database** from scratch, super light, without dependencies just for fun and learning. This database uses **Append-Only Log** paradigm. It's a good idea? No. So why? Why not?!
+This is a **toy projects!** The goal is to create a **NoSQL Database** from scratch, super light, without dependencies just for fun and learning. This database uses **Append-Only Log** paradigm for inserting and Indexing to retrieve data. It's a good idea? No. So why? Why not?!
 
-### File format:
-Header:
-```
-index_counter:1000001
-```
+**Be patient, I'm writing a lot of documentation as I write code, but, in this phase I'm rewriting a lot of code. So documentation will come when I start to consolidate some principle :P**
 
-Database:
-```
-[id],[content]
+For now this project allow you to write row on a single database and uses indexing to retrieve data by Id. 
 
-//example
-80,{"name":"josh",age:19}
-```
-
-### Usage:
-You can add rows using this command:
-```
-main.exe insert <content>
-main.exe find <id>
-main.exe insert_one_millions (insert one million of rows!)
-```
-
-For now find by id can reach the result in **~150ms** in the wrost case scenario. My goal is to create the fastest queries to retrieve result as soon as I can. It's for learning purpose! :D
+## Supported Operations:
+- Inserting data 
+- Retrieve data by id
