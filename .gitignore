@@ -44,3 +44,7 @@ build/Debug/outDebug.exe
 mydb_ids_indexes.db
 mydb.db
 .vs/MightyMorphinNoSQL/v17/DocumentLayout.backup.json
+
+mmdb.exe
+
+.vscode/tasks.json
