@@ -41,7 +41,7 @@ uint64_t find_offset_by_id(FILE *db_indexes, uint32_t target_id) {
 char *get_by_id(FILE *db_indexes, FILE *db, uint32_t target_id) {
   uint64_t offset = find_offset_by_id(db_indexes, target_id);
 
-  if (offset == -1) {
+  if (offset == (uint64_t)-1) {
     printf("Id %u not found.\n", target_id);
     return NULL;
   }

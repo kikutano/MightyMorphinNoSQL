@@ -1,7 +1,32 @@
 #include "utils.h"
 #include <stdint.h>
+#include <stdio.h>
 #include <stdlib.h>
 
+void print_database_metadata(const char *file_name) {
+  FILE *db_file = fopen(file_name, "r+b");
+
+  if (!db_file) {
+    printf("Error: cannot open db file.\n");
+    return;
+  }
+
+  fseek(db_file, 0, SEEK_SET);
+
+  printf("> Database Metadata:\n");
+  printf("> Database Tables:\n");
+  char buffer[256];
+  while (fgets(buffer, sizeof(buffer), db_file)) {
+    printf(" - %s", buffer);
+  }
+
+  fclose(db_file);
+
+  printf("\n");
+  printf("> Database Metadata end.\n");
+}
+
+//---
 void print_db_file(FILE *db) {
   if (!db) {
     printf("Error: cannot open db file.\n");
