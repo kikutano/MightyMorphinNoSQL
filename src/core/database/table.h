@@ -6,7 +6,7 @@
 typedef struct {
     char name[256];
     FILE *file;
-    FILE *indexes;
+    FILE *ids_indexes;
     FILE *metadata;
 } Table;
 

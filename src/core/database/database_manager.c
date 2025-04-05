@@ -1,4 +1,5 @@
 #include "database_manager.h"
+#include "table.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -10,6 +11,8 @@
 
 /* TODO:
     - Incapsulate naming costruction in a function
+    - Incapsulate opening file inside a single function for table, indexes and
+   metadata.
  */
 
 void create_database(const char *name) {
@@ -101,8 +104,54 @@ void create_database_table(Database *database, const char *name) {
   char table_name_on_file[256];
   sprintf(table_name_on_file, "%s\n", name);
   fwrite(table_name_on_file, sizeof(char), strlen(table_name_on_file), db_file);
-  
+
   printf("> Table [%s] created in database [[%s]].\n", name, database->name);
 
   fclose(db_file);
+}
+
+Table *open_database_table_connection(Database *database, const char *name) {
+  char table_file_name[256];
+  sprintf(table_file_name, FILE_DB_TABLE_SUFFIX, database->name, name);
+
+  FILE *table_file = fopen(table_file_name, "a+b");
+  if (!table_file) {
+    printf("> Error opening table file: %s\n", table_file_name);
+    return NULL;
+  }
+
+  char db_file_name_indexes[256];
+  sprintf(db_file_name_indexes, FILE_DB_TABLE_INDEXES_SUFFIX, database->name,
+          name);
+  FILE *db_file_indexes = fopen(db_file_name_indexes, "a+b");
+
+  if (!db_file_indexes) {
+    printf("> Error opening table file indexes: %s\n", db_file_name_indexes);
+    return NULL;
+  }
+
+  char table_metadata_file_name[256];
+  sprintf(table_metadata_file_name, FILE_DB_TABLE_METADATA_SUFFIX,
+          database->name, name);
+
+  FILE *table_metadata_file = fopen(table_metadata_file_name, "a+b");
+  if (!table_metadata_file) {
+    printf("> Error opening table file metadata: %s\n",
+           table_metadata_file_name);
+    return NULL;
+  }
+
+  Table *table = malloc(sizeof(Table));
+  table->file = table_file;
+  table->ids_indexes = db_file_indexes;
+  table->metadata = table_metadata_file;
+
+  return table;
+}
+
+void close_database_table_connection(Table *table) {
+  fclose(table->metadata);
+  fclose(table->file);
+  fclose(table->ids_indexes);
+  free(table);
 }

@@ -8,6 +8,7 @@ void create_database(const char *name);
 Database *open_database_connection(const char *name);
 void close_database_connection(Database *database);
 void create_database_table(Database *database, const char *name);
-Table *get_database_table(Database *database, const char *name);
+Table *open_database_table_connection(Database *database, const char *name);
+void close_database_table_connection(Table *table);
 
 #endif

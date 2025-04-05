@@ -1,10 +1,12 @@
 #include "src/core/database/database_manager.h"
+#include "src/core/inserting/insert.h"
 #include "src/utils/utils.h"
-// #include "src/core/inserting/insert.h"
+
 // #include "src/core/querying/find.h"
 // #include "src/utils/utils.h"
 #include <limits.h>
 #include <stdint.h>
+#include <stdlib.h>
 
 /*
         WORKING ON:
@@ -29,17 +31,27 @@
 */
 
 int main() {
-
   create_database("mydb");
   Database *db = open_database_connection("mydb");
   create_database_table(db, "users");
   create_database_table(db, "products");
+
+  Table *users_table = open_database_table_connection(db, "users");
+  insert(users_table, 1, "Dutch Matrix");
+  insert(users_table, 2, "John Rambo");
+
+  Table *products_table = open_database_table_connection(db, "products");
+  insert(products_table, 1, "Ratios");
+  insert(products_table, 2, "Meats");
+
+  close_database_table_connection(users_table);
+  close_database_table_connection(products_table);
+
   close_database_connection(db);
 
-  // do some inserts
-  // do some queries
-
   print_database_metadata("mydb.db");
+  print_database_table("mydb_users_table.db");
+  print_database_table("mydb_products_table.db");
 
   return 0;
 }

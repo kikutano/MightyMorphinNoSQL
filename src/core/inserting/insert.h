@@ -3,7 +3,8 @@
 
 #include <stdint.h>
 #include <stdio.h>
+#include "../database/table.h"
 
-void insert(FILE *db_indexes, FILE *db, uint32_t id, const char *content);
+void insert(Table *table, uint32_t id, const char *content);
 
 #endif

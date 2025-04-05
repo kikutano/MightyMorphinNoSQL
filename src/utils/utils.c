@@ -26,6 +26,35 @@ void print_database_metadata(const char *file_name) {
   printf("> Database Metadata end.\n");
 }
 
+void print_database_table(const char *file_name) {
+  FILE *file = fopen(file_name, "r+b");
+
+  if (!file) {
+    printf("> Error: cannot open db file.\n");
+    return;
+  }
+
+  fseek(file, 0, SEEK_SET);
+
+  uint32_t id, content_size;
+
+  printf("> Db Rows:\n");
+  while (fread(&id, sizeof(uint32_t), 1, file)) {
+    fread(&content_size, sizeof(uint32_t), 1, file);
+
+    char *content = malloc(content_size);
+    if (!content) {
+      printf("> Error during memory allocation.\n");
+      return;
+    }
+
+    fread(content, sizeof(char), content_size, file);
+    printf("> Id: %u, Content: %s\n", id, content);
+
+    free(content);
+  }
+}
+
 //---
 void print_db_file(FILE *db) {
   if (!db) {
