@@ -48,3 +48,5 @@ mydb.db
 mmdb.exe
 
 .vscode/tasks.json
+
+*.db
