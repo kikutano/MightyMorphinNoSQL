@@ -19,10 +19,19 @@ void create_database(const char *name) {
   char db_file_name[256];
   sprintf(db_file_name, FILE_DB_SUFFIX, name);
 
+  FILE *existing_file = fopen(db_file_name, "r");
+  if (existing_file) {
+    printf("> Warning: database '%s' command will be skipped!\n", db_file_name);
+    fclose(existing_file);
+    return;
+  }
+
   FILE *db_file = fopen(db_file_name, "a+b");
   if (!db_file) {
     db_file = fopen(db_file_name, "w+b");
   }
+
+  printf("> Database %s created! \n", name);
 }
 
 Database *open_database_connection(const char *name) {
@@ -43,6 +52,8 @@ Database *open_database_connection(const char *name) {
 
   strncpy(database->name, name, sizeof(database->name) - 1);
   database->name[sizeof(database->name) - 1] = '\0';
+
+  printf(">> Connection with database %s established! Enjoy!\n", name);
 
   return database;
 }
