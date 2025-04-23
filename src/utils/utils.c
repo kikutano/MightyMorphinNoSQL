@@ -1,4 +1,7 @@
 #include "utils.h"
+#include "../core/database/database.h"
+#include "../core/database/table.h"
+#include "../core/inserting/insert.h"
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -100,3 +103,46 @@ void print_index_file(FILE *db_indexes) {
     printf("Id: %u, Offset: %lu\n", id, offset);
   }
 }
+
+void create_dummy_rows(int how_many) {
+  create_database("bigdatabase");
+  Database *db = open_database_connection("bigdatabase");
+  create_database_table(db, "bigtable.db");
+  Table *table = open_database_table_connection(db, "bigtable");
+
+  for (uint64_t i = 0; i < how_many; i++) {
+    char content[256];
+    sprintf(content,
+            "{\"data1\":1,\"data2\":2,\"datastring\":\"Amazing result %lu\"}",
+            (uint64_t)i);
+    insert(table, i, content);
+  }
+
+  close_database_connection(db);
+}
+
+/* USAGE
+uint32_t rows = 10000000;
+  // create_dummy_rows(rows);
+
+  Database *db = open_database_connection("bigdatabase");
+  Table *table = open_database_table_connection(db, "bigtable");
+
+  LARGE_INTEGER frequency, start, end;
+  QueryPerformanceFrequency(&frequency);
+  QueryPerformanceCounter(&start);
+
+  char *content = get_by_id(table, rows - 1);
+
+  QueryPerformanceCounter(&end);
+
+  double elapsed_time_ms =
+      (end.QuadPart - start.QuadPart) * 1000.0 / frequency.QuadPart;
+  printf("Elapsed time: %.2f ms\n", elapsed_time_ms);
+
+  printf("> Content found, content: %s\n", content);
+
+  free(content);
+  close_database_table_connection(table);
+  close_database_connection(db);
+*/
