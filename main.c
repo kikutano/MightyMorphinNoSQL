@@ -16,6 +16,7 @@
     - CRUD operations
     - Use a b-tree to store and search indexes?
     - Indexing searching (search by a param)
+    - Create a front-end for command line
 
     TODO:
     9. Concurrency anyone?
@@ -33,9 +34,9 @@
 
 int main() {
   printf("Welcome to Mighty Morphin NoSQL!\n");
-  printf("Version: 0.1.0\n");
+  printf("Version: 0.1.1\n");
   char input[256];
-  char *context = NULL;
+  // char *context = NULL;
 
   Database *current_database;
 
@@ -62,96 +63,24 @@ int main() {
         create_database_table(current_database, command->params[0]);
       } else if (command->command_id == COMMAND_OPEN_DATABASE_CONNECTION) {
         current_database = open_database_connection(command->params[0]);
-      }
-
-      free_command(command);
-    }
-
-    /*char *token = strtok_s(input, " ", &context);
-
-    // create database [name]
-    // create table [name]
-    if (strcmp(token, "create") == 0) {
-      token = strtok_s(NULL, " ", &context);
-
-      if (token != NULL && strcmp(token, "database") == 0) {
-        token = strtok_s(NULL, " ", &context);
-
-        if (token == NULL) {
-          printf("Error. Database name must be specified!\n");
-          continue;
-        } else {
-          create_database(token);
-        }
-      } else if (token != NULL && strcmp(token, "table") == 0) {
-        token = strtok_s(NULL, " ", &context);
-        if (current_database != NULL) {
-          if (token == NULL) {
-            printf("Error. Table name must be specified!\n");
-            continue;
-          } else {
-            create_database_table(current_database, token);
-          }
-        } else {
-          printf("Error. Use open connection database [name] first!\n");
-        }
-      }
-    }
-    // open connection database [name]
-    else if (strcmp(token, "open") == 0) {
-      token = strtok_s(NULL, " ", &context);
-
-      if (token != NULL && strcmp(token, "connection") == 0) {
-        token = strtok_s(NULL, " ", &context);
-
-        if (strcmp(token, "database") == 0) {
-          token = strtok_s(NULL, " ", &context);
-          current_database = open_database_connection(token);
-        }
-      }
-    }
-    // insert into [table] [id] [content]
-    else if (strcmp(token, "insert") == 0) {
-      token = strtok_s(NULL, " ", &context);
-
-      if (token != NULL && strcmp(token, "into") == 0) {
-        token = strtok_s(NULL, " ", &context);
-        Table *table = open_database_table_connection(current_database, token);
-        token = strtok_s(NULL, " ", &context);
-        int id = atoi(token);
-        token = strtok_s(NULL, " ", &context);
-        insert(table, id, token);
+      } else if (command->command_id == COMMAND_INSERT_INTO_TABLE) {
+        Table *table = open_database_table_connection(current_database,
+                                                      command->params[0]);
+        int id = atoi(command->params[1]);
+        insert(table, id, command->params[2]);
         close_database_table_connection(table);
-      }
-    }
-    // find on [table] by [id]
-    else if (strcmp(token, "find") == 0) {
-      token = strtok_s(NULL, " ", &context);
-
-      if (token != NULL && strcmp(token, "on") == 0) {
-        token = strtok_s(NULL, " ", &context);
-        Table *table = open_database_table_connection(current_database, token);
-        token = strtok_s(NULL, " ", &context);
-        int id = atoi(token);
+      } else if (command->command_id == COMMAND_SELECT) {
+        Table *table = open_database_table_connection(current_database,
+                                                      command->params[0]);
+        int id = atoi(command->params[2]);
         char *content = get_by_id(table, id);
         printf("Row found with Id: %d, content: %s\n", id, content);
         free(content);
         close_database_table_connection(table);
       }
-    }
-    // print database [name]
-    // print table [name]
-    else if (strcmp(token, "print") == 0) {
-      token = strtok_s(NULL, " ", &context);
 
-      if (token != NULL && strcmp(token, "database") == 0) {
-        token = strtok_s(NULL, " ", &context);
-        print_database_metadata(token);
-      } else if (token != NULL && strcmp(token, "table") == 0) {
-        token = strtok_s(NULL, " ", &context);
-        print_database_table(token);
-      }
-    }*/
+      free_command(command);
+    }
   }
 
   return 0;

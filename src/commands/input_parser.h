@@ -13,7 +13,8 @@ Supported commands:
 * [] variable value
 
 Queryies:
-- select * from [table_name] where id = [value]
+- select * from [table_name] where [column] = [value] --column id only ;)
+- select top [n] * from [table_name]
 
 Commands:
 
