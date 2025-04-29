@@ -6,6 +6,28 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+void print_query_result(DocumentCollection *collection) {
+  if (collection == NULL) {
+    printf("> No results to display.\n");
+    return;
+  }
+
+  if (collection->size == 0) {
+    printf("> Query returned 0 results.\n");
+    return;
+  }
+
+  printf("> Query returned %u results:\n", collection->size);
+
+  for (unsigned int i = 0; i < collection->size; ++i) {
+    printf("- ID: %u", collection->items[i].id);
+    if (collection->with_content && collection->items[i].content != NULL) {
+      printf(", Content: %s", collection->items[i].content);
+    }
+    printf("\n");
+  }
+}
+
 void print_database_metadata(const char *file_name) {
   FILE *db_file = fopen(file_name, "r+b");
 

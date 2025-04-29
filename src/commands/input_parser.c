@@ -56,7 +56,7 @@ char *get_next_token(char **context) {
 }
 
 int is_valid_token(const char *token, const char *token_key) {
-  if (token == NULL || strcmp(token, CONNECTION) != 0)
+  if (token == NULL || strcmp(token, token_key) != 0)
     return 0;
   return 1;
 }
@@ -169,14 +169,14 @@ Command *parse_insert(char *context) {
 Command *parse_select(char *context) {
   //*
   char *token_star = get_next_token(&context);
-  if (is_valid_token(token_star, STAR)) {
+  if (!is_valid_token(token_star, STAR)) {
     printf("Sintax error. Only select * allowed.");
     return NULL;
   }
 
   // from
   char *token_from = get_next_token(&context);
-  if (is_valid_token(token_from, FROM)) {
+  if (!is_valid_token(token_from, FROM)) {
     printf("Sintax error. Only from after * allowed.");
     return NULL;
   }
@@ -190,7 +190,10 @@ Command *parse_select(char *context) {
 
   // where
   char *token_where = get_next_token(&context);
-  if (is_valid_token(token_where, WHERE)) {
+  if (token_where == NULL) {
+    /*select * from [table_name]*/
+    return create_command(COMMAND_SELECT, 1, token_table_name);
+  } else if (!is_valid_token(token_where, WHERE)) {
     printf("Sintax error. Where is the where after the table name?!");
     return NULL;
   }
@@ -204,7 +207,7 @@ Command *parse_select(char *context) {
 
   // =
   char *token_equal = get_next_token(&context);
-  if (is_valid_token(token_equal, EQUAL)) {
+  if (!is_valid_token(token_equal, EQUAL)) {
     printf("Sintax error. Where is = after the id?");
     return NULL;
   }
@@ -216,6 +219,7 @@ Command *parse_select(char *context) {
     return NULL;
   }
 
+  // select * from [table_name] where [column] = [value]
   return create_command(COMMAND_SELECT, 3, token_table_name, token_column,
                         token_value);
 }

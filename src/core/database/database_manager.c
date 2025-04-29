@@ -1,4 +1,5 @@
 #include "database_manager.h"
+#include "../../logs/log.h"
 #include "table.h"
 #include <stdio.h>
 #include <stdlib.h>
@@ -53,7 +54,7 @@ Database *open_database_connection(const char *name) {
   strncpy(database->name, name, sizeof(database->name) - 1);
   database->name[sizeof(database->name) - 1] = '\0';
 
-  printf(">> Connection with database %s established! Enjoy!\n", name);
+  log("Connection with database %s established! Enjoy!", name);
 
   return database;
 }
@@ -122,6 +123,11 @@ void create_database_table(Database *database, const char *name) {
 }
 
 Table *open_database_table_connection(Database *database, const char *name) {
+  if (database == NULL) {
+    printf("> Error. Database is null. Did you opened a connection?");
+    return NULL;
+  }
+
   char table_file_name[256];
   sprintf(table_file_name, FILE_DB_TABLE_SUFFIX, database->name, name);
 

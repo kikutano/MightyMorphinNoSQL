@@ -14,7 +14,7 @@ Supported commands:
 
 Queryies:
 - select * from [table_name] where [column] = [value] --column id only ;)
-- select top [n] * from [table_name]
+- select * from [table_name]
 
 Commands:
 
