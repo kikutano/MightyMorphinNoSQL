@@ -3,6 +3,7 @@
 #include "src/commands/input_parser.h"
 #include "src/core/database/database.h"
 #include "src/core/database/database_manager.h"
+#include "src/core/database/document.h"
 #include "src/core/inserting/insert.h"
 #include "src/core/querying/find.h"
 #include "src/utils/utils.h"
@@ -13,6 +14,7 @@
 
 /*
     TOP PRIORITY:
+    - Fix warning!
     - CRUD operations
     - Use a b-tree to store and search indexes?
     - Indexing searching (search by a param)
@@ -70,13 +72,12 @@ int main() {
         insert(table, id, command->params[2]);
         close_database_table_connection(table);
       } else if (command->command_id == COMMAND_SELECT) {
-        Table *table = open_database_table_connection(current_database,
-                                                      command->params[0]);
-        int id = atoi(command->params[2]);
-        char *content = get_by_id(table, id);
-        printf("Row found with Id: %d, content: %s\n", id, content);
-        free(content);
-        close_database_table_connection(table);
+        DocumentCollection *collection =
+            perform_select(current_database, command);
+
+        print_query_result(collection);
+
+        free(collection);
       }
 
       free_command(command);
