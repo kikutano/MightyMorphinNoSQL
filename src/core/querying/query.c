@@ -1,4 +1,4 @@
-#include "find.h"
+#include "query.h"
 #include "../../logs/log.h"
 #include "../database/database_manager.h"
 #include <stdio.h>
@@ -41,35 +41,9 @@ uint64_t find_offset_by_id(Table *table, uint32_t target_id) {
   return (uint64_t)-1;
 }
 
-char *get_by_id(Table *table, uint32_t target_id) {
-  uint64_t offset = find_offset_by_id(table, target_id);
-
-  if (offset == (uint64_t)-1) {
-    log("Id %u not found.\n", target_id);
-    return NULL;
-  }
-
-  /* Go to offset position on db */
-  fseek(table->file, offset, SEEK_SET);
-
-  // Read the id and the size of the content
-  uint32_t stored_id, content_size;
-  fread(&stored_id, sizeof(uint32_t), 1, table->file);
-  fread(&content_size, sizeof(uint32_t), 1, table->file);
-
-  char *buffer = (char *)malloc(content_size);
-
-  /* Put inside buffer the content of the row */
-  fread(buffer, sizeof(char), content_size, table->file);
-  buffer[content_size - 1] = '\0';
-
-  return buffer;
-}
-
 /*
 Todo:
 - add content to items
-- add where support to id
 - add where support to columns
  */
 DocumentCollection *perform_select(Database *database, Command *query) {
@@ -84,8 +58,7 @@ DocumentCollection *perform_select(Database *database, Command *query) {
   uint64_t offset = 0;
   if (query->params_count >= 2) {
     /* If the where clause is indicated, the id value is into params[2]
-     * position. We support only where on id.
-     */
+     * position. We support only where on id. */
     where_id = atoi(query->params[2]);
     offset = find_offset_by_id(table, where_id);
 

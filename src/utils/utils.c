@@ -126,7 +126,7 @@ void print_index_file(FILE *db_indexes) {
   }
 }
 
-void create_dummy_rows(int how_many) {
+/*void create_dummy_rows(int how_many) {
   create_database("bigdatabase");
   Database *db = open_database_connection("bigdatabase");
   create_database_table(db, "bigtable.db");
@@ -141,7 +141,7 @@ void create_dummy_rows(int how_many) {
   }
 
   close_database_connection(db);
-}
+}*/
 
 /* USAGE
 uint32_t rows = 10000000;

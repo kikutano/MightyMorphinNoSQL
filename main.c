@@ -5,7 +5,7 @@
 #include "src/core/database/database_manager.h"
 #include "src/core/database/document.h"
 #include "src/core/inserting/insert.h"
-#include "src/core/querying/find.h"
+#include "src/core/querying/query.h"
 #include "src/utils/utils.h"
 #include <stdatomic.h>
 #include <stdio.h>
@@ -14,31 +14,26 @@
 
 /*
     TOP PRIORITY:
+    - Return content inside the query
+    - Renaming a lot of shit! Do some refactoring for god sake!
     - Fix warning!
+
+    NEXT:
     - CRUD operations
     - Use a b-tree to store and search indexes?
     - Indexing searching (search by a param)
-    - Create a front-end for command line
 
-    TODO:
-    9. Concurrency anyone?
-    11. Use multiple files for indexes and data
-
-    TODO INDEXING:
-    3. Load indexes in memory RAM
-
-    TODO QUERY LANGUAGE:
-    1. Do we need a query language?
-
-    TCP Layer:
-    - Language choose
+    TODO BACKLOG:
+    - Concurrency anyone?
+    - Tcp Layer
+    - Load indexes in memory RAM
+    - Do we need a query language?
 */
 
 int main() {
   printf("Welcome to Mighty Morphin NoSQL!\n");
   printf("Version: 0.1.1\n");
   char input[256];
-  // char *context = NULL;
 
   Database *current_database;
 
