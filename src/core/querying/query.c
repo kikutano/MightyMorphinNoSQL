@@ -52,7 +52,7 @@ DocumentCollection *perform_select(Database *database, Command *query) {
   DocumentCollection *collection = malloc(sizeof(DocumentCollection));
   collection->items = NULL;
   collection->size = 0;
-  collection->with_content = 0;
+  collection->with_content = 1;
 
   uint32_t where_id = 0;
   uint64_t offset = 0;
@@ -68,10 +68,14 @@ DocumentCollection *perform_select(Database *database, Command *query) {
     }
   }
 
+  // Go on file position where the data start
+  // Data is store in this format: [id][content_size][content + '\0']
   fseek(table->file, offset, SEEK_SET);
   do {
     uint32_t stored_id, content_size;
+    // Read the [id] as the first data
     size_t read_id = fread(&stored_id, sizeof(uint32_t), 1, table->file);
+    // Read the size of the content [content_size]. How chars has the content?
     size_t read_size = fread(&content_size, sizeof(uint32_t), 1, table->file);
 
     if (read_id != 1 || read_size != 1) {
@@ -83,7 +87,26 @@ DocumentCollection *perform_select(Database *database, Command *query) {
 
     collection->items = items;
     collection->items[collection->size].id = stored_id;
-    collection->items[collection->size].content = NULL;
+
+    char *content = malloc(content_size);
+    fread(content, sizeof(char), content_size, table->file);
+    collection->items[collection->size].content = content;
+
+    /*if (collection->with_content) {
+      char *content = malloc(content_size);
+      size_t read_content =
+          fread(content, sizeof(char), content_size, table->file);
+      if (read_content != content_size) {
+        free(content);
+        break;
+      }
+      collection->items[collection->size].content = content;
+    } else {
+      collection->items[collection->size].content = NULL;
+      fseek(table->file, content_size, SEEK_CUR);
+    }*/
+
+    //collection->items[collection->size].content = NULL;
     collection->size++;
 
     fseek(table->file, content_size, SEEK_CUR);
@@ -94,4 +117,18 @@ DocumentCollection *perform_select(Database *database, Command *query) {
 
   close_database_table_connection(table);
   return collection;
+}
+
+void free_document_collection(DocumentCollection *collection) {
+  if (collection == NULL)
+    return;
+
+  for (size_t i = 0; i < collection->size; ++i) {
+    if (collection->items[i].content != NULL) {
+      free(collection->items[i].content);
+    }
+  }
+
+  free(collection->items);
+  free(collection);
 }

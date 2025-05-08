@@ -72,7 +72,7 @@ int main() {
 
         print_query_result(collection);
 
-        free(collection);
+        free_document_collection(collection);
       }
 
       free_command(command);

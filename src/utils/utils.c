@@ -1,7 +1,4 @@
 #include "utils.h"
-#include "../core/database/database.h"
-#include "../core/database/table.h"
-#include "../core/inserting/insert.h"
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -20,7 +17,7 @@ void print_query_result(DocumentCollection *collection) {
   printf("> Query returned %u results:\n", collection->size);
 
   for (unsigned int i = 0; i < collection->size; ++i) {
-    printf("- ID: %u", collection->items[i].id);
+    printf("- Id: %u", collection->items[i].id);
     if (collection->with_content && collection->items[i].content != NULL) {
       printf(", Content: %s", collection->items[i].content);
     }

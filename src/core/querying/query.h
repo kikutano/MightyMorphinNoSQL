@@ -9,5 +9,6 @@
 #include "../../commands/command.h"
 
 DocumentCollection *perform_select(Database *database, Command *query);
+void free_document_collection(DocumentCollection *collection);
 
 #endif

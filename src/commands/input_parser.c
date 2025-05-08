@@ -1,8 +1,11 @@
 #include "input_parser.h"
+#include "../logs/log.h"
 #include "command.h"
 #include "command_keys.h"
 #include "token_keys.h"
+#include <ctype.h>
 #include <stdarg.h>
+#include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -130,6 +133,39 @@ Command *parse_open(char *context) {
   return create_command(COMMAND_OPEN_DATABASE_CONNECTION, 1, db_name);
 }
 
+char *get_content_to_insert(char *context) {
+  // '[content with spaces]'
+  char *remaining = context;
+  // remove eventually spaces before che content
+  while (*remaining != '\0' && isspace((unsigned char)*remaining)) {
+    remaining++;
+  }
+
+  char *content = NULL;
+  if (*remaining != '\'') {
+    log("Error: content must be specified using \'content\'");
+    return NULL;
+  }
+
+  // get the first quote '
+  char quote = *remaining;
+  // skip the ' character
+  remaining++;
+  // get the last quote ' at the end of the content
+  char *end_quote = strchr(remaining, quote);
+  if (end_quote == NULL) {
+    log("Error: Missing closing quote for content!");
+    return NULL;
+  }
+
+  size_t content_len = end_quote - remaining;
+  content = malloc(content_len + 1);
+  strncpy(content, remaining, content_len);
+  content[content_len] = '\0';
+
+  return content;
+}
+
 // Parse all insert commands
 Command *parse_insert(char *context) {
   // into
@@ -146,11 +182,9 @@ Command *parse_insert(char *context) {
 
   // [id]
   char *id = strtok_s(NULL, DELIMETER, &context);
-
-  // [content]
-  char *content = strtok_s(NULL, DELIMETER, &context);
-
-  // insert into [table] [id] [content]
+  // '[content with spaces]'
+  char *content = get_content_to_insert(context);
+  // insert into [table] [id] '[content with spaces]'
   Command *command =
       create_command(COMMAND_INSERT_INTO_TABLE, 3, table_name, id, content);
 
