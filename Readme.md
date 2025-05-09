@@ -17,6 +17,7 @@ For now this project allow you to write row on a single database and uses indexi
 * `[] variable value`
 
 #### Queries:
+- `select * from [table_name]`
 - `select * from [table_name] where id = [value]`
 
 #### Commands:

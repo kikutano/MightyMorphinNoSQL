@@ -91,25 +91,9 @@ DocumentCollection *perform_select(Database *database, Command *query) {
     char *content = malloc(content_size);
     fread(content, sizeof(char), content_size, table->file);
     collection->items[collection->size].content = content;
-
-    /*if (collection->with_content) {
-      char *content = malloc(content_size);
-      size_t read_content =
-          fread(content, sizeof(char), content_size, table->file);
-      if (read_content != content_size) {
-        free(content);
-        break;
-      }
-      collection->items[collection->size].content = content;
-    } else {
-      collection->items[collection->size].content = NULL;
-      fseek(table->file, content_size, SEEK_CUR);
-    }*/
-
-    //collection->items[collection->size].content = NULL;
     collection->size++;
 
-    fseek(table->file, content_size, SEEK_CUR);
+    //fseek(table->file,  content_size, SEEK_CUR);
 
     if (where_id > 0)
       break;
