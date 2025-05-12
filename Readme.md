@@ -3,24 +3,33 @@
 </div>
 
 # MightyMorphinNoSQL
+A simple NoSQL database built for learning purposes. This database uses the **Append-Only Log** paradigm to store data and **indexes** to retrieve documents.  
+My goal is to build an entire NoSQL database from scratch — with no dependencies — that’s easy to use and as fast as possible.
 
-A simple NoSql database.
+I'm not a C expert — I'm learning by doing. So be patient :P
 
-## Disclaimer:
-This is a **toy projects!** The goal is to create a **NoSQL Database** from scratch, super light, without dependencies just for fun and learning. This database uses **Append-Only Log** paradigm for inserting and Indexing to retrieve data. It's a good idea? No. So why? Why not?!
+## Milestone 1 (v0.1.3)
+✅ Implemented  
+👨‍💻 In progress
 
-**Be patient, I'm writing a lot of documentation as I write code, but, in this phase I'm rewriting a lot of code. So documentation will come when I start to consolidate some principle :P**
+The goal of the first release is to allow you to:
 
-For now this project allow you to write row on a single database and uses indexing to retrieve data by Id. 
+- ✅ Create databases and tables  
+- ✅ Insert documents  
+- ✅ Search documents by ID as fast as possible (**currently uses divide et impera to search indexes**)  
+- 👨‍💻 Search and filter by columns  
+- 👨‍💻 Implement indexing using B-Tree  
 
-## Supported commands:
-* `[] variable value`
+## Next Goals
+
+- CRUD operations  
+- TCP layer  
+- Concurrency support  
+- Automated tests  
 
 #### Queries:
 - `select * from [table_name]`
 - `select * from [table_name] where id = [value]`
-
-#### Commands:
 
 #### Commands, rows:
 - `insert into [table] [id] '[content with spaces]'`
@@ -40,10 +49,4 @@ insert into my_amazing_table_1 1 'value1 with spaces'
 insert into my_amazing_table_1 2 'value2 with spaces'
 insert into my_amazing_table_2 1 'value3 with spaces'
 insert into my_amazing_table_2 2 'value4 with spaces'
-
-find on my_amazing_table_2 2
-print database my_amazing_db.db
-print table my_amazing_db_my_amazing_table_2_table.db
 ```
-
-And yes, I'known there is a lot of work to do. :)

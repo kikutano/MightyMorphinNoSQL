@@ -13,8 +13,14 @@
 #include <string.h>
 
 /*
+    Version 0.1.3 Milestones:
+    - Create databases
+    - Insert and save documents
+    - Search documents by Id as fast as you can
+    - [Bonus] Search by column values
+    
     TOP PRIORITY:
-    - Return content inside the query
+    - Select columns and search by columns
     - Renaming a lot of shit! Do some refactoring for god sake!
     - Fix warning!
 
@@ -32,7 +38,7 @@
 
 int main() {
   printf("Welcome to Mighty Morphin NoSQL!\n");
-  printf("Version: 0.1.1\n");
+  printf("Version: 0.1.3\n");
   char input[256];
 
   Database *current_database;

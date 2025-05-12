@@ -93,8 +93,6 @@ DocumentCollection *perform_select(Database *database, Command *query) {
     collection->items[collection->size].content = content;
     collection->size++;
 
-    //fseek(table->file,  content_size, SEEK_CUR);
-
     if (where_id > 0)
       break;
   } while (1);
