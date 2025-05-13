@@ -21,7 +21,8 @@ Command *parse_select(char *context);
 void free_command(Command *command) {
   if (command != NULL) {
     for (int i = 0; i < command->params_count; i++) {
-      free(command->params[i]);
+      if (command->params[i] != NULL)
+        free(command->params[i]);
     }
 
     free(command->params);

@@ -1,28 +1,17 @@
-#include "src/commands/command.h"
-#include "src/commands/command_keys.h"
-#include "src/commands/input_parser.h"
-#include "src/core/database/database.h"
-#include "src/core/database/database_manager.h"
-#include "src/core/database/document.h"
-#include "src/core/inserting/insert.h"
-#include "src/core/querying/query.h"
-#include "src/utils/utils.h"
-#include <stdatomic.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+#include "src/mightymorphinnosql.h"
 
 /*
-    Version 0.1.3 Milestones:
+    Version 0.1.3 Milestone:
     - Create databases
     - Insert and save documents
     - Search documents by Id as fast as you can
-    - [Bonus] Search by column values
-    
+    - [Bonus] Search by column values (indexing columns?)
+
     TOP PRIORITY:
     - Select columns and search by columns
     - Renaming a lot of shit! Do some refactoring for god sake!
     - Fix warning!
+    - Json validator
 
     NEXT:
     - CRUD operations
@@ -77,7 +66,6 @@ int main() {
             perform_select(current_database, command);
 
         print_query_result(collection);
-
         free_document_collection(collection);
       }
 

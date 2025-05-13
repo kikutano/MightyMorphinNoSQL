@@ -21,11 +21,11 @@ The goal of the first release is to allow you to:
 - 👨‍💻 Implement indexing using B-Tree  
 
 ## Next Goals
-
 - CRUD operations  
 - TCP layer  
 - Concurrency support  
-- Automated tests  
+- Automated tests
+- Json validator
 
 #### Queries:
 - `select * from [table_name]`
