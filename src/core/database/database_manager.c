@@ -1,43 +1,54 @@
 #include "database_manager.h"
-#include "../../logs/log.h"
+#include "../../logs/mm_log.h"
 #include "table.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
-#define FILE_DB_SUFFIX "%s.db"
-#define FILE_DB_TABLE_SUFFIX "%s_%s_table.db"
-#define FILE_DB_TABLE_METADATA_SUFFIX "%s_%s_table_metadata.db"
-#define FILE_DB_TABLE_INDEXES_SUFFIX "%s_%s_table_ids_indexes.db"
-
-/* TODO:
-    - Incapsulate naming costruction in a function
-    - Incapsulate opening file inside a single function for table, indexes and
-   metadata.
- */
+static const char *FILE_DB_SUFFIX = ".db";
+static const char *FILE_DB_TABLE_SUFFIX = "_table.db";
+static const char *FILE_DB_TABLE_METADATA_SUFFIX = "_table_metadata.db";
+static const char *FILE_DB_TABLE_INDEXES_SUFFIX = "_table_ids_indexes.db";
 
 void create_database(const char *name) {
-  char db_file_name[256];
-  sprintf(db_file_name, FILE_DB_SUFFIX, name);
-
-  FILE *existing_file = fopen(db_file_name, "r");
-  if (existing_file) {
-    printf("> Warning: database '%s' command will be skipped!\n", db_file_name);
-    fclose(existing_file);
+  if (strlen(name) > 252) {
+    mm_log("Error: name too long to create a valid DB file name.\n");
     return;
   }
 
-  FILE *db_file = fopen(db_file_name, "a+b");
-  if (!db_file) {
-    db_file = fopen(db_file_name, "w+b");
+  char db_file_name[256];
+  snprintf(db_file_name, sizeof(db_file_name), "%s%s", name, FILE_DB_SUFFIX);
+
+  FILE *existing_file = fopen(db_file_name, "r");
+  if (existing_file) {
+    fclose(existing_file);
+    mm_log("Warning: database '%s' command will be skipped!\n", db_file_name);
+    return;
   }
 
-  printf("> Database %s created! \n", name);
+  FILE *db_file = fopen(db_file_name, "w+b");
+  fclose(db_file);
+  mm_log("Database %s created! \n", name);
+}
+
+void delete_database(const char *name) {
+  char db_file_name[256];
+  snprintf(db_file_name, sizeof(db_file_name), "%s%s", name, FILE_DB_SUFFIX);
+
+  FILE *existing_file = fopen(db_file_name, "w+b");
+  fclose(existing_file);
+
+  if (remove(db_file_name) == 0) {
+    mm_log("File %s removed!", db_file_name);
+  } else {
+    perror("Error during file elimination!");
+    printf("Code error: %d\n", errno);
+  }
 }
 
 Database *open_database_connection(const char *name) {
   char db_file_name[256];
-  sprintf(db_file_name, FILE_DB_SUFFIX, name);
+  snprintf(db_file_name, sizeof(db_file_name), "%s%s", name, FILE_DB_SUFFIX);
 
   FILE *db_file = fopen(db_file_name, "a+b");
   if (!db_file) {
@@ -48,14 +59,10 @@ Database *open_database_connection(const char *name) {
   Database *database = malloc(sizeof(Database));
   database->metadata = db_file;
 
-  /* TODO database->tables = malloc(sizeof(Table) * 10); Allocate space for 10
-   * tables (example) */
-
   strncpy(database->name, name, sizeof(database->name) - 1);
   database->name[sizeof(database->name) - 1] = '\0';
 
-  log("Connection with database %s established! Enjoy!", name);
-
+  mm_log("Connection with database %s established! Enjoy!", name);
   return database;
 }
 
@@ -67,7 +74,8 @@ void close_database_connection(Database *database) {
 void create_database_table(Database *database, const char *name) {
   /* Skip if table exists*/
   char db_file_name[256];
-  sprintf(db_file_name, FILE_DB_SUFFIX, database->name);
+  snprintf(db_file_name, sizeof(db_file_name), "%s%s", database->name,
+           FILE_DB_SUFFIX);
   FILE *db_file = fopen(db_file_name, "a+b");
 
   fseek(db_file, 0, SEEK_SET);
@@ -84,7 +92,8 @@ void create_database_table(Database *database, const char *name) {
 
   /* Create table file */
   char table_file_name[256];
-  sprintf(table_file_name, FILE_DB_TABLE_SUFFIX, database->name, name);
+  snprintf(table_file_name, sizeof(table_file_name), "%s%s%s",
+           FILE_DB_TABLE_SUFFIX, database->name, name);
 
   FILE *table_file = fopen(table_file_name, "a+b");
   if (!table_file) {
@@ -93,8 +102,8 @@ void create_database_table(Database *database, const char *name) {
 
   /* Create table metadata file */
   char table_metadata_file_name[256];
-  sprintf(table_metadata_file_name, FILE_DB_TABLE_METADATA_SUFFIX,
-          database->name, name);
+  snprintf(table_metadata_file_name, sizeof(table_metadata_file_name), "%s%s%s",
+           FILE_DB_TABLE_METADATA_SUFFIX, database->name, name);
 
   FILE *table_metadata_file = fopen(table_metadata_file_name, "a+b");
   if (!table_metadata_file) {
@@ -103,8 +112,8 @@ void create_database_table(Database *database, const char *name) {
 
   /* Create table indexes file */
   char db_file_name_indexes[256];
-  sprintf(db_file_name_indexes, FILE_DB_TABLE_INDEXES_SUFFIX, database->name,
-          name);
+  snprintf(db_file_name_indexes, sizeof(db_file_name_indexes), "%s%s%s",
+           FILE_DB_TABLE_INDEXES_SUFFIX, database->name, name);
 
   FILE *db_file_indexes = fopen(db_file_name_indexes, "a+b");
 
@@ -129,7 +138,8 @@ Table *open_database_table_connection(Database *database, const char *name) {
   }
 
   char table_file_name[256];
-  sprintf(table_file_name, FILE_DB_TABLE_SUFFIX, database->name, name);
+  snprintf(table_file_name, sizeof(table_file_name), "%s%s%s",
+           FILE_DB_TABLE_SUFFIX, database->name, name);
 
   FILE *table_file = fopen(table_file_name, "a+b");
   if (!table_file) {
@@ -138,8 +148,8 @@ Table *open_database_table_connection(Database *database, const char *name) {
   }
 
   char db_file_name_indexes[256];
-  sprintf(db_file_name_indexes, FILE_DB_TABLE_INDEXES_SUFFIX, database->name,
-          name);
+  snprintf(db_file_name_indexes, sizeof(db_file_name_indexes), "%s%s%s",
+           FILE_DB_TABLE_INDEXES_SUFFIX, database->name, name);
   FILE *db_file_indexes = fopen(db_file_name_indexes, "a+b");
 
   if (!db_file_indexes) {
@@ -148,8 +158,8 @@ Table *open_database_table_connection(Database *database, const char *name) {
   }
 
   char table_metadata_file_name[256];
-  sprintf(table_metadata_file_name, FILE_DB_TABLE_METADATA_SUFFIX,
-          database->name, name);
+  snprintf(table_metadata_file_name, sizeof(table_metadata_file_name), "%s%s%s",
+           FILE_DB_TABLE_METADATA_SUFFIX, database->name, name);
 
   FILE *table_metadata_file = fopen(table_metadata_file_name, "a+b");
   if (!table_metadata_file) {

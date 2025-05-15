@@ -3,6 +3,7 @@
 
 #define DELIMETER " "
 #define CREATE "create"
+#define DELETE "delete"
 #define DATABASE "database"
 #define TABLE "table"
 #define OPEN "open"

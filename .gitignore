@@ -50,3 +50,4 @@ mmdb.exe
 .vscode/tasks.json
 
 *.db
+*.exe

@@ -1,5 +1,5 @@
 #include "query.h"
-#include "../../logs/log.h"
+#include "../../logs/mm_log.h"
 #include "../database/database_manager.h"
 #include <stdio.h>
 #include <stdlib.h>
@@ -63,7 +63,7 @@ DocumentCollection *perform_select(Database *database, Command *query) {
     offset = find_offset_by_id(table, where_id);
 
     if (offset == (uint64_t)-1) {
-      log("Id %u not found.\n", where_id);
+      mm_log("Id %u not found.\n", where_id);
       return collection;
     }
   }

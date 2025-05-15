@@ -119,7 +119,7 @@ void print_index_file(FILE *db_indexes) {
   printf("Indexes:\n");
   while (fread(&id, sizeof(uint32_t), 1, db_indexes)) {
     fread(&offset, sizeof(uint64_t), 1, db_indexes);
-    printf("Id: %u, Offset: %lu\n", id, offset);
+    printf("Id: %u, Offset: %llu\n", id, offset);
   }
 }
 

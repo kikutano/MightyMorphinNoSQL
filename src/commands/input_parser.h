@@ -3,7 +3,7 @@
 
 #include "Command.h"
 
-Command* input_parse(char *input);
+Command* input_parse(const char *input);
 void free_command(Command *command);
 
 #endif

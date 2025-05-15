@@ -1,4 +1,5 @@
-#include "src/mightymorphinnosql.h"
+#include "./tests/unittests.h"
+#include <stdlib.h>
 
 /*
     Version 0.1.3 Milestone:
@@ -30,8 +31,6 @@ int main() {
   printf("Version: 0.1.3\n");
   char input[256];
 
-  Database *current_database;
-
   while (1) {
     printf(">> ");
 
@@ -45,32 +44,8 @@ int main() {
     if (strlen(input) == 0) {
       continue;
     }
-
-    Command *command = input_parse(input);
-
-    if (command != NULL) {
-      if (command->command_id == COMMAND_CREATE_DATABASE) {
-        create_database(command->params[0]);
-      } else if (command->command_id == COMMAND_CREATE_TABLE) {
-        create_database_table(current_database, command->params[0]);
-      } else if (command->command_id == COMMAND_OPEN_DATABASE_CONNECTION) {
-        current_database = open_database_connection(command->params[0]);
-      } else if (command->command_id == COMMAND_INSERT_INTO_TABLE) {
-        Table *table = open_database_table_connection(current_database,
-                                                      command->params[0]);
-        int id = atoi(command->params[1]);
-        insert(table, id, command->params[2]);
-        close_database_table_connection(table);
-      } else if (command->command_id == COMMAND_SELECT) {
-        DocumentCollection *collection =
-            perform_select(current_database, command);
-
-        print_query_result(collection);
-        free_document_collection(collection);
-      }
-
-      free_command(command);
-    }
+    
+    command_run(input);
   }
 
   return 0;

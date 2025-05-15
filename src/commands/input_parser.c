@@ -1,5 +1,5 @@
 #include "input_parser.h"
-#include "../logs/log.h"
+#include "../logs/mm_log.h"
 #include "command.h"
 #include "command_keys.h"
 #include "token_keys.h"
@@ -12,15 +12,16 @@
 #include <vadefs.h>
 
 Command *create_command(int command_id, int params_count, ...);
-Command *input_parse(char *input);
+Command *input_parse(const char *input);
 Command *parse_create(char *context);
 Command *parse_open(char *context);
 Command *parse_insert(char *context);
 Command *parse_select(char *context);
+Command *parse_delete(char *context);
 
 void free_command(Command *command) {
   if (command != NULL) {
-    for (int i = 0; i < command->params_count; i++) {
+    for (unsigned int i = 0; i < command->params_count; i++) {
       if (command->params[i] != NULL)
         free(command->params[i]);
     }
@@ -65,9 +66,13 @@ int is_valid_token(const char *token, const char *token_key) {
   return 1;
 }
 
-Command *input_parse(char *input) {
+Command *input_parse(const char *input) {
+  size_t input_len = strlen(input);
+  char *cpy_input = malloc(input_len + 1);
+  strcpy_s(cpy_input, input_len + 1, input);
+
   char *context = NULL;
-  char *token = strtok_s(input, DELIMETER, &context);
+  char *token = strtok_s(cpy_input, DELIMETER, &context);
 
   if (token == NULL)
     return NULL;
@@ -80,12 +85,17 @@ Command *input_parse(char *input) {
     return parse_insert(context);
   } else if (strcmp(token, SELECT) == 0) {
     return parse_select(context);
+  } else if (strcmp(token, DELETE) == 0) {
+    return parse_delete(context);
   }
 
+  free(cpy_input);
+  free(context);
+  free(token);
   return NULL;
 }
 
-// Parses all create commands.
+// Parses all create commands
 Command *parse_create(char *context) {
   char *token = strtok_s(NULL, DELIMETER, &context);
   if (token == NULL)
@@ -95,12 +105,39 @@ Command *parse_create(char *context) {
     // create database [name]
     char *db_name = strtok_s(NULL, DELIMETER, &context);
     if (db_name == NULL) {
-      printf("Error. Database name must be specified!\n");
+      mm_log("Error. Database name must be specified!\n");
       return NULL;
     }
     return create_command(COMMAND_CREATE_DATABASE, 1, db_name);
   } else if (strcmp(token, TABLE) == 0) {
     // create table [name]
+    char *table_name = strtok_s(NULL, DELIMETER, &context);
+    if (table_name == NULL) {
+      mm_log("Error. Table name must be specified!\n");
+      return NULL;
+    }
+    return create_command(COMMAND_CREATE_TABLE, 1, table_name);
+  }
+
+  return NULL;
+}
+
+// Parses all delete commands
+Command *parse_delete(char *context) {
+  char *token = strtok_s(NULL, DELIMETER, &context);
+  if (token == NULL)
+    return NULL;
+
+  if (strcmp(token, DATABASE) == 0) {
+    // delete database [name]
+    char *db_name = strtok_s(NULL, DELIMETER, &context);
+    if (db_name == NULL) {
+      printf("Error. Database name must be specified!\n");
+      return NULL;
+    }
+    return create_command(COMMAND_DELETE_DATABASE, 1, db_name);
+  } else if (strcmp(token, TABLE) == 0) {
+    // delete table [name]
     char *table_name = strtok_s(NULL, DELIMETER, &context);
     if (table_name == NULL) {
       printf("Error. Table name must be specified!\n");
@@ -144,7 +181,7 @@ char *get_content_to_insert(char *context) {
 
   char *content = NULL;
   if (*remaining != '\'') {
-    log("Error: content must be specified using \'content\'");
+    mm_log("Error: content must be specified using \'content\'");
     return NULL;
   }
 
@@ -155,7 +192,7 @@ char *get_content_to_insert(char *context) {
   // get the last quote ' at the end of the content
   char *end_quote = strchr(remaining, quote);
   if (end_quote == NULL) {
-    log("Error: Missing closing quote for content!");
+    mm_log("Error: Missing closing quote for content!");
     return NULL;
   }
 

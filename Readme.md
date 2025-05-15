@@ -5,6 +5,7 @@
 # MightyMorphinNoSQL
 A simple NoSQL database built for learning purposes. This database uses the **Append-Only Log** paradigm to store data and **indexes** to retrieve documents.  
 My goal is to build an entire NoSQL database from scratch — with no dependencies — that’s easy to use and as fast as possible.
+Anothe goal is to maintain code as simple and minimalist as I can.
 
 I'm not a C expert — I'm learning by doing. So be patient :P
 
