@@ -19,6 +19,8 @@ void command_run(const char *input) {
       create_database_table(current_database, command->params[0]);
     } else if (command->command_id == COMMAND_OPEN_DATABASE_CONNECTION) {
       current_database = open_database_connection(command->params[0]);
+    } else if (command->command_id == COMMAND_CLOSE_DATABASE_CONNECTION) {
+      close_database_connection(current_database);
     } else if (command->command_id == COMMAND_INSERT_INTO_TABLE) {
       Table *table =
           open_database_table_connection(current_database, command->params[0]);

@@ -7,7 +7,6 @@
 typedef  struct {
     char name[256];
     FILE *metadata;
-    Table *tables;
 } Database;
 
 #endif

@@ -31,13 +31,59 @@ void create_database(const char *name) {
   mm_log("Database %s created! \n", name);
 }
 
-void delete_database(const char *name) {
+void delete_database(const char *db_name) {
   char db_file_name[256];
-  snprintf(db_file_name, sizeof(db_file_name), "%s%s", name, FILE_DB_SUFFIX);
+  snprintf(db_file_name, sizeof(db_file_name), "%s%s", db_name, FILE_DB_SUFFIX);
+  FILE *db_file = fopen(db_file_name, "r+b");
+  fseek(db_file, 0, SEEK_SET);
 
-  FILE *existing_file = fopen(db_file_name, "w+b");
-  fclose(existing_file);
+  // remove tables files
+  char table_name[256];
+  while (fgets(table_name, sizeof(table_name), db_file)) {
+    size_t len = strlen(table_name);
+    if (table_name[len - 1] == '\n') {
+      table_name[len - 1] = '\0';
+    }
 
+    //remove table file
+    char table_file_name[256];
+    snprintf(table_file_name, sizeof(table_file_name), "%s_%s%s", db_name,
+             table_name, FILE_DB_TABLE_SUFFIX);
+
+    if (remove(table_file_name) == 0) {
+      mm_log("File %s removed!", table_file_name);
+    } else {
+      perror("Error during table file elimination");
+      printf("Code error: %d on table %s", errno, table_file_name);
+    }
+
+    // remove table metadata
+    char table_metadata_file_name[256];
+    snprintf(table_metadata_file_name, sizeof(table_metadata_file_name),
+             "%s_%s%s", db_name, table_name, FILE_DB_TABLE_METADATA_SUFFIX);
+
+    if (remove(table_metadata_file_name) == 0) {
+      mm_log("File %s removed!", table_metadata_file_name);
+    } else {
+      perror("Error during table metadata file elimination");
+      printf("Code error: %d on table %s", errno, table_metadata_file_name);
+    }
+
+    // remove table ids indexes
+    char table_ids_indexes_file_name[256];
+    snprintf(table_ids_indexes_file_name, sizeof(table_ids_indexes_file_name),
+             "%s_%s%s", db_name, table_name, FILE_DB_TABLE_INDEXES_SUFFIX);
+
+    if (remove(table_ids_indexes_file_name) == 0) {
+      mm_log("File %s removed!", table_ids_indexes_file_name);
+    } else {
+      perror("Error during table indexes file elimination");
+      printf("Code error: %d on table %s", errno, table_metadata_file_name);
+    }
+  }
+
+  // remove database file
+  fclose(db_file);
   if (remove(db_file_name) == 0) {
     mm_log("File %s removed!", db_file_name);
   } else {
@@ -82,8 +128,8 @@ void create_database_table(Database *database, const char *name) {
   char buffer[256];
   while (fgets(buffer, sizeof(buffer), db_file)) {
     if (strstr(buffer, name) != NULL) {
-      printf("> Warning: Table [%s] already exists in database [[%s]]. This "
-             "command will be skipped.\n",
+      mm_log("Warning: Table %s already exists in database %s. This command "
+             "will be skipped.",
              name, database->name);
       fclose(db_file);
       return;
@@ -92,8 +138,8 @@ void create_database_table(Database *database, const char *name) {
 
   /* Create table file */
   char table_file_name[256];
-  snprintf(table_file_name, sizeof(table_file_name), "%s%s%s",
-           FILE_DB_TABLE_SUFFIX, database->name, name);
+  snprintf(table_file_name, sizeof(table_file_name), "%s_%s%s", database->name,
+           name, FILE_DB_TABLE_SUFFIX);
 
   FILE *table_file = fopen(table_file_name, "a+b");
   if (!table_file) {
@@ -102,8 +148,8 @@ void create_database_table(Database *database, const char *name) {
 
   /* Create table metadata file */
   char table_metadata_file_name[256];
-  snprintf(table_metadata_file_name, sizeof(table_metadata_file_name), "%s%s%s",
-           FILE_DB_TABLE_METADATA_SUFFIX, database->name, name);
+  snprintf(table_metadata_file_name, sizeof(table_metadata_file_name),
+           "%s_%s%s", database->name, name, FILE_DB_TABLE_METADATA_SUFFIX);
 
   FILE *table_metadata_file = fopen(table_metadata_file_name, "a+b");
   if (!table_metadata_file) {
@@ -112,8 +158,8 @@ void create_database_table(Database *database, const char *name) {
 
   /* Create table indexes file */
   char db_file_name_indexes[256];
-  snprintf(db_file_name_indexes, sizeof(db_file_name_indexes), "%s%s%s",
-           FILE_DB_TABLE_INDEXES_SUFFIX, database->name, name);
+  snprintf(db_file_name_indexes, sizeof(db_file_name_indexes), "%s_%s%s",
+           database->name, name, FILE_DB_TABLE_INDEXES_SUFFIX);
 
   FILE *db_file_indexes = fopen(db_file_name_indexes, "a+b");
 
@@ -126,9 +172,11 @@ void create_database_table(Database *database, const char *name) {
   sprintf(table_name_on_file, "%s\n", name);
   fwrite(table_name_on_file, sizeof(char), strlen(table_name_on_file), db_file);
 
-  printf("> Table [%s] created in database [[%s]].\n", name, database->name);
-
+  mm_log("Table %s created in database %s", name, database->name);
   fclose(db_file);
+  fclose(table_file);
+  fclose(table_metadata_file);
+  fclose(db_file_indexes);
 }
 
 Table *open_database_table_connection(Database *database, const char *name) {

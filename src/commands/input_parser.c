@@ -15,6 +15,7 @@ Command *create_command(int command_id, int params_count, ...);
 Command *input_parse(const char *input);
 Command *parse_create(char *context);
 Command *parse_open(char *context);
+Command *parse_close(char *context);
 Command *parse_insert(char *context);
 Command *parse_select(char *context);
 Command *parse_delete(char *context);
@@ -81,6 +82,8 @@ Command *input_parse(const char *input) {
     return parse_create(context);
   } else if (strcmp(token, OPEN) == 0) {
     return parse_open(context);
+  } else if (strcmp(token, CLOSE) == 0) {
+    return parse_close(context);
   } else if (strcmp(token, INSERT) == 0) {
     return parse_insert(context);
   } else if (strcmp(token, SELECT) == 0) {
@@ -164,11 +167,33 @@ Command *parse_open(char *context) {
   // [name]
   char *db_name = strtok_s(NULL, DELIMETER, &context);
   if (db_name == NULL) {
-    printf("Error. Database name must be specified!\n");
+    mm_log("Error. Database name must be specified!");
     return NULL;
   }
 
   return create_command(COMMAND_OPEN_DATABASE_CONNECTION, 1, db_name);
+}
+
+// Parse all close commands
+Command *parse_close(char *context) {
+  // connection
+  char *token = strtok_s(NULL, DELIMETER, &context);
+  if (token == NULL || strcmp(token, CONNECTION) != 0)
+    return NULL;
+
+  // database
+  token = strtok_s(NULL, DELIMETER, &context);
+  if (token == NULL || strcmp(token, DATABASE) != 0)
+    return NULL;
+
+  // [name]
+  char *db_name = strtok_s(NULL, DELIMETER, &context);
+  if (db_name == NULL) {
+    mm_log("Error. Database name must be specified!");
+    return NULL;
+  }
+
+  return create_command(COMMAND_CLOSE_DATABASE_CONNECTION, 1, db_name);
 }
 
 char *get_content_to_insert(char *context) {

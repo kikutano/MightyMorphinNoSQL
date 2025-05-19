@@ -7,6 +7,7 @@
 #define DATABASE "database"
 #define TABLE "table"
 #define OPEN "open"
+#define CLOSE "close"
 #define CONNECTION "connection"
 #define INSERT "insert"
 #define INTO "into"

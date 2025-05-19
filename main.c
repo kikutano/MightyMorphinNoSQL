@@ -1,5 +1,4 @@
-#include "./tests/unittests.h"
-#include <stdlib.h>
+#include "./src/mightymorphinnosql.h"
 
 /*
     Version 0.1.3 Milestone:
@@ -22,29 +21,28 @@
     TODO BACKLOG:
     - Concurrency anyone?
     - Tcp Layer
+    - UI html
     - Load indexes in memory RAM
     - Do we need a query language?
 */
 
 int main() {
-  printf("Welcome to Mighty Morphin NoSQL!\n");
-  printf("Version: 0.1.3\n");
+  mm_log("Welcome to Mighty Morphin NoSQL!");
+  mm_log("Version: 0.1.3");
   char input[256];
 
   while (1) {
     printf(">> ");
-
     if (fgets(input, sizeof(input), stdin) == NULL) {
-      printf("\nexit...\n");
+      mm_log("\nexit...\n");
       break;
     }
 
     input[strcspn(input, "\n")] = 0;
-
     if (strlen(input) == 0) {
       continue;
     }
-    
+
     command_run(input);
   }
 
