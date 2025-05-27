@@ -64,6 +64,8 @@ DocumentCollection *perform_select(Database *database, Command *query) {
 
     if (offset == (uint64_t)-1) {
       mm_log("Id %u not found.\n", where_id);
+
+      close_database_table_connection(table);
       return collection;
     }
   }

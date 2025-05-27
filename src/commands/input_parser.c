@@ -78,24 +78,23 @@ Command *input_parse(const char *input) {
   if (token == NULL)
     return NULL;
 
+  Command *created_command = NULL;
   if (strcmp(token, CREATE) == 0) {
-    return parse_create(context);
+    created_command = parse_create(context);
   } else if (strcmp(token, OPEN) == 0) {
-    return parse_open(context);
+    created_command = parse_open(context);
   } else if (strcmp(token, CLOSE) == 0) {
-    return parse_close(context);
+    created_command = parse_close(context);
   } else if (strcmp(token, INSERT) == 0) {
-    return parse_insert(context);
+    created_command = parse_insert(context);
   } else if (strcmp(token, SELECT) == 0) {
-    return parse_select(context);
+    created_command = parse_select(context);
   } else if (strcmp(token, DELETE) == 0) {
-    return parse_delete(context);
+    created_command = parse_delete(context);
   }
 
   free(cpy_input);
-  free(context);
-  free(token);
-  return NULL;
+  return created_command;
 }
 
 // Parses all create commands
@@ -251,6 +250,7 @@ Command *parse_insert(char *context) {
   Command *command =
       create_command(COMMAND_INSERT_INTO_TABLE, 3, table_name, id, content);
 
+  free(content);
   return command;
 }
 

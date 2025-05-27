@@ -1,8 +1,8 @@
-#ifndef  UTILS_H_
-#define  UTILS_H_
+#ifndef UTILS_H_
+#define UTILS_H_
 
-#include <stdio.h>
 #include "../core/database/document.h"
+#include <stdio.h>
 
 void print_database_metadata(const char *file_name);
 void print_database_table(const char *file_name);

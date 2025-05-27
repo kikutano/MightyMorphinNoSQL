@@ -1,6 +1,7 @@
 #ifndef MIGHTYMORPHINNOSQL_H_
 #define MIGHTYMORPHINNOSQL_H_
 
+#include "./logs/mm_log.h"
 #include "commands/command.h"
 #include "commands/command_keys.h"
 #include "commands/input_parser.h"
@@ -10,11 +11,11 @@
 #include "core/inserting/insert.h"
 #include "core/querying/query.h"
 #include "utils/utils.h"
-#include "./logs/mm_log.h"
 #include <stdatomic.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
 
 void command_run(const char *input);
 

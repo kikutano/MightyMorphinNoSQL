@@ -84,7 +84,7 @@ void create_database_table(Database *database, const char *name) {
 
 Table *open_database_table_connection(Database *database, const char *name) {
   if (database == NULL) {
-    printf("> Error. Database is null. Did you opened a connection?");
+    mm_log("Error. Database is null. Did you opened a connection?");
     return NULL;
   }
 

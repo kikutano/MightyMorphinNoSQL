@@ -34,7 +34,7 @@ int main() {
   while (1) {
     printf(">> ");
     if (fgets(input, sizeof(input), stdin) == NULL) {
-      mm_log("\nexit...\n");
+      mm_log("exit...");
       break;
     }
 

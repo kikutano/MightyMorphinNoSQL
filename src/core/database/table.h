@@ -4,10 +4,10 @@
 #include <stdio.h>
 
 typedef struct {
-    char name[256];
-    FILE *file;
-    FILE *ids_indexes;
-    FILE *metadata;
+  char name[256];
+  FILE *file;
+  FILE *ids_indexes;
+  FILE *metadata;
 } Table;
 
 #endif

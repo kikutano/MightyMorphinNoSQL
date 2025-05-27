@@ -76,7 +76,7 @@ mmdb_create_database_table_ids_indexes_file_name(const char *db_name,
 // gets
 FILE *mmdb_get_file(const char *file_name) {
   FILE *existing_file = fopen(file_name, "r+b");
-  
+
   if (existing_file) {
     fseek(existing_file, 0, SEEK_SET);
     mmdb_free_file_name(file_name);

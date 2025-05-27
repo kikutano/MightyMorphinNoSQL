@@ -31,7 +31,7 @@ void command_run(const char *input) {
       DocumentCollection *collection =
           perform_select(current_database, command);
 
-      print_query_result(collection);
+      //print_query_result(collection);
       free_document_collection(collection);
     }
 
