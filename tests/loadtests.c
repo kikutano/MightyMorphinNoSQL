@@ -3,7 +3,7 @@
 #include <stdio.h>
 #include <time.h>
 
-const long long NUM_OPERATIONS = 1000;
+const long long NUM_OPERATIONS = 10000;
 
 void perform_bulk_insert() {
   char query_buffer[256];

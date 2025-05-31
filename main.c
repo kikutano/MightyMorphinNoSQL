@@ -24,6 +24,7 @@
     - UI html
     - Load indexes in memory RAM
     - Do we need a query language?
+    - InMemory
 */
 
 int main() {
