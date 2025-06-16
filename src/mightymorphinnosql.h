@@ -10,12 +10,12 @@
 #include "core/database/document.h"
 #include "core/inserting/insert.h"
 #include "core/querying/query.h"
+#include "core/bplustree/bplustree.h"
 #include "utils/utils.h"
 #include <stdatomic.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
 
 void command_run(const char *input);
 

@@ -1,5 +1,4 @@
 #include "./src/mightymorphinnosql.h"
-
 /*
     Version 0.1.3 Milestone:
     - Create databases
@@ -28,24 +27,24 @@
 */
 
 int main() {
-  mm_log("Welcome to Mighty Morphin NoSQL!");
-  mm_log("Version: 0.1.3");
-  char input[256];
+    mm_log("Welcome to Mighty Morphin NoSQL!");
+    mm_log("Version: 0.1.3");
+    char input[256];
 
-  while (1) {
-    printf(">> ");
-    if (fgets(input, sizeof(input), stdin) == NULL) {
-      mm_log("exit...");
-      break;
+    while (1) {
+        printf(">> ");
+        if (fgets(input, sizeof(input), stdin) == NULL) {
+            mm_log("exit...");
+            break;
+        }
+
+        input[strcspn(input, "\n")] = 0;
+        if (strlen(input) == 0) {
+            continue;
+        }
+
+        command_run(input);
     }
 
-    input[strcspn(input, "\n")] = 0;
-    if (strlen(input) == 0) {
-      continue;
-    }
-
-    command_run(input);
-  }
-
-  return 0;
+    return 0;
 }

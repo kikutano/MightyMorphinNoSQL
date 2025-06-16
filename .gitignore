@@ -51,3 +51,11 @@ mmdb.exe
 
 *.db
 *.exe
+/MMNoSQL/x64
+/MightyMo.71D369AA
+/.vs
+/.idea
+/.idea
+/.idea
+*.index
+/.idea

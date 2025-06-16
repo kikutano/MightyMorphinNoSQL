@@ -14,11 +14,3 @@ void test_database_instructions_suite() {
   command_run("close connection database testdb");
   command_run("delete database testdb");
 }
-
-int main() {
-  mm_log("Running unit tests:");
-  //test_database_instructions_suite();
-  perform_full_load_test();
-  mm_log("All tests finished.");
-  return 0;
-}
