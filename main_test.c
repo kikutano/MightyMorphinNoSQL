@@ -12,7 +12,8 @@ int main() {
     mm_bplustree_insert(tree, 15);
     mm_bplustree_insert(tree, 25);
     mm_bplustree_insert(tree, 35);
-    //mm_bplustree_insert(tree, 45);
+    mm_bplustree_insert(tree, 45);
+    mm_bplustree_insert(tree, 10);
 
     mm_bplustree_print(tree);
 

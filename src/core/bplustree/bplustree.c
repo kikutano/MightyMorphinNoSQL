@@ -22,31 +22,79 @@ BPlusTreeNode *create_node(BPlusTree *tree, bool is_leaf) {
 
 void insert_in_leaf(BPlusTreeNode *node, int key) {
     int i = 0;
-
     //find the position to place the key
     for (i = 0; i < node->num_keys && node->keys[i] < key; i++);
 
-    //shift the remaining keys on right
-    for (int j = node->num_keys; j > i; j--) {
-        node->keys[j] = node->keys[j - 1];
-        node->pointers[j] = node->pointers[j - 1]; // swap the values
-    }
-
     //insert the new key
     node->keys[i] = key;
-    node->pointers[i] = NULL;
     node->num_keys++;
 }
 
-void insert_in_internal(BPlusTree *tree, BPlusTreeNode *parent, int promoted_key, BPlusTreeNode *left,
-                        BPlusTreeNode *right) {
-    if (parent->num_keys == tree->order - 1) {
-        //we need to split the parent node! good luck!
-        return;
-    } else {
-        insert_in_leaf(parent, promoted_key);
+void insert_in_internal(BPlusTree *tree, BPlusTreeNode *parent, int promoted_key,
+                        BPlusTreeNode *left, BPlusTreeNode *right) {
+    int i;
+
+    // Trova la posizione in cui inserire la chiave promossa
+    for (i = 0; i < parent->num_keys && parent->keys[i] < promoted_key; i++);
+
+    // Sposta chiavi e puntatori per fare spazio
+    for (int j = parent->num_keys; j > i; j--) {
+        parent->keys[j] = parent->keys[j - 1];
+        parent->pointers[j + 1] = parent->pointers[j];
+    }
+
+    // Inserisci la nuova chiave e il nuovo puntatore destro
+    parent->keys[i] = promoted_key;
+    parent->pointers[i + 1] = right;
+    parent->num_keys++;
+
+    right->parent = parent;
+
+    // 🔁 Se il nodo è ora pieno, bisogna splittarlo e propagare ancora
+    if (parent->num_keys == tree->order) {
+        int mid = parent->num_keys / 2;
+        int new_promoted = parent->keys[mid];
+
+        BPlusTreeNode *new_internal = create_node(tree, false);
+        new_internal->parent = parent->parent;
+
+        // Copia metà destra delle chiavi e dei figli nel nuovo nodo
+        new_internal->num_keys = 0;
+        for (int j = mid + 1, k = 0; j < parent->num_keys; j++, k++) {
+            new_internal->keys[k] = parent->keys[j];
+            new_internal->pointers[k] = parent->pointers[j];
+            if (new_internal->pointers[k]) {
+                ((BPlusTreeNode *)new_internal->pointers[k])->parent = new_internal;
+            }
+            new_internal->num_keys++;
+        }
+        // Copia l’ultimo puntatore
+        new_internal->pointers[new_internal->num_keys] = parent->pointers[parent->num_keys];
+        if (new_internal->pointers[new_internal->num_keys]) {
+            ((BPlusTreeNode *)new_internal->pointers[new_internal->num_keys])->parent = new_internal;
+        }
+
+        // Riduci il nodo originale
+        parent->num_keys = mid;
+
+        // Se il nodo era la root
+        if (parent == tree->root) {
+            BPlusTreeNode *new_root = create_node(tree, false);
+            new_root->keys[0] = new_promoted;
+            new_root->pointers[0] = parent;
+            new_root->pointers[1] = new_internal;
+            new_root->num_keys = 1;
+
+            parent->parent = new_root;
+            new_internal->parent = new_root;
+            tree->root = new_root;
+        } else {
+            // Altrimenti, ricorsivamente inserisci nel padre
+            insert_in_internal(tree, parent->parent, new_promoted, parent, new_internal);
+        }
     }
 }
+
 
 void split_leaf_node(BPlusTree *tree, BPlusTreeNode *node, int key) {
     // Inserisci la nuova chiave nel nodo esistente prima dello split
@@ -56,6 +104,7 @@ void split_leaf_node(BPlusTree *tree, BPlusTreeNode *node, int key) {
     int split_index = node->num_keys / 2;
 
     BPlusTreeNode *right_node_new = create_node(tree, true);
+    right_node_new->parent = node->parent;
 
     // copy all right values on right node
     for (int i = 0; i < node->num_keys - split_index; i++) {
@@ -139,40 +188,57 @@ void mm_bplustree_insert(BPlusTree *tree, int key) {
 }
 
 void mm_bplustree_print(BPlusTree *tree) {
-    BPlusTreeNode *curr_node = tree->root;
-
-    unsigned int level = 0;
-    printf("level %i: ", level);
-    while (1) {
-        for (int i = 0; i < curr_node->num_keys; i++) {
-            BPlusTreeNode *pointer = NULL;
-            pointer = curr_node->pointers[i];
-
-            int pointer_first_key = -1;
-            if (pointer != NULL)
-                pointer_first_key = pointer->keys[0];
-
-            printf("(pV: %i)[k: %i]", pointer_first_key, curr_node->keys[i]);
-        }
-
-        int last_pointer_last_key = -1;
-        BPlusTreeNode *pointer = curr_node->pointers[curr_node->num_keys];
-        if (pointer != NULL) {
-            last_pointer_last_key = pointer->keys[0];
-        }
-
-        printf("(pV: %i)", last_pointer_last_key);
-        if (curr_node->is_leaf & curr_node->next != NULL) {
-            curr_node = curr_node->next;
-            printf((" --> "));
-        } else if (curr_node->is_leaf && curr_node->next == NULL) {
-            break;
-        } else {
-            curr_node = curr_node->pointers[0];
-            level++;
-            printf("\n");
-            printf("level %i: ", level);
-        }
+    if (!tree || !tree->root) {
+        printf("(tree is empty)\n");
+        return;
     }
-    printf("\n");
+
+    // Coda per BFS
+    BPlusTreeNode **queue = malloc(sizeof(BPlusTreeNode*) * 1000);
+    int front = 0, back = 0;
+
+    queue[back++] = tree->root;
+    int nodes_in_level = 1;
+    int next_level_count = 0;
+    int level = 0;
+
+    printf("\n--- B+Tree ---\n");
+
+    while (front < back) {
+        printf("Level %d: ", level);
+
+        int printed = 0;
+        for (int i = 0; i < nodes_in_level; i++) {
+            BPlusTreeNode *node = queue[front++];
+
+            printf("[");
+            for (int j = 0; j < node->num_keys; j++) {
+                printf("%d", node->keys[j]);
+                if (j < node->num_keys - 1)
+                    printf(" | ");
+            }
+            printf("] ");
+
+            // Se non è foglia, aggiungiamo i figli alla coda
+            if (!node->is_leaf) {
+                for (int j = 0; j <= node->num_keys; j++) {
+                    queue[back++] = (BPlusTreeNode *)node->pointers[j];
+                    next_level_count++;
+                }
+            }
+
+            printed++;
+        }
+
+        printf("\n");
+
+        // Vai al livello successivo
+        nodes_in_level = next_level_count;
+        next_level_count = 0;
+        level++;
+    }
+
+    free(queue);
+    printf("--- end ---\n\n");
 }
+
