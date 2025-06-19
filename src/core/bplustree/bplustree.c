@@ -64,14 +64,15 @@ void insert_in_internal(BPlusTree *tree, BPlusTreeNode *parent, int promoted_key
             new_internal->keys[k] = parent->keys[j];
             new_internal->pointers[k] = parent->pointers[j];
             if (new_internal->pointers[k]) {
-                ((BPlusTreeNode *)new_internal->pointers[k])->parent = new_internal;
+                ((BPlusTreeNode *) new_internal->pointers[k])->parent = new_internal;
             }
             new_internal->num_keys++;
         }
+
         // Copia l’ultimo puntatore
         new_internal->pointers[new_internal->num_keys] = parent->pointers[parent->num_keys];
         if (new_internal->pointers[new_internal->num_keys]) {
-            ((BPlusTreeNode *)new_internal->pointers[new_internal->num_keys])->parent = new_internal;
+            ((BPlusTreeNode *) new_internal->pointers[new_internal->num_keys])->parent = new_internal;
         }
 
         // Riduci il nodo originale
@@ -94,7 +95,6 @@ void insert_in_internal(BPlusTree *tree, BPlusTreeNode *parent, int promoted_key
         }
     }
 }
-
 
 void split_leaf_node(BPlusTree *tree, BPlusTreeNode *node, int key) {
     // Inserisci la nuova chiave nel nodo esistente prima dello split
@@ -187,58 +187,58 @@ void mm_bplustree_insert(BPlusTree *tree, int key) {
     }
 }
 
-void mm_bplustree_print(BPlusTree *tree) {
-    if (!tree || !tree->root) {
-        printf("(tree is empty)\n");
-        return;
-    }
+int mm_bplustree_find(BPlusTree *tree, int key) {
+    BPlusTreeNode *node = find_leaf_node(tree, key);
 
-    // Coda per BFS
-    BPlusTreeNode **queue = malloc(sizeof(BPlusTreeNode*) * 1000);
+    for (int i = 0; i < node->num_keys; i++) {
+        if (node->keys[i] == key)
+            return node->keys[i];
+    }
+}
+
+char *mm_bplustree_to_string(BPlusTree *tree) {
+    char *buffer = malloc(4096);
+    buffer[0] = '\0';
+
+    BPlusTreeNode *queue[100];
+    int level[100];
     int front = 0, back = 0;
 
-    queue[back++] = tree->root;
-    int nodes_in_level = 1;
-    int next_level_count = 0;
-    int level = 0;
-
-    printf("\n--- B+Tree ---\n");
+    queue[back] = tree->root;
+    level[back++] = 0;
+    int current_level = -1;
 
     while (front < back) {
-        printf("Level %d: ", level);
+        BPlusTreeNode *node = queue[front];
+        int node_level = level[front++];
 
-        int printed = 0;
-        for (int i = 0; i < nodes_in_level; i++) {
-            BPlusTreeNode *node = queue[front++];
-
-            printf("[");
-            for (int j = 0; j < node->num_keys; j++) {
-                printf("%d", node->keys[j]);
-                if (j < node->num_keys - 1)
-                    printf(" | ");
-            }
-            printf("] ");
-
-            // Se non è foglia, aggiungiamo i figli alla coda
-            if (!node->is_leaf) {
-                for (int j = 0; j <= node->num_keys; j++) {
-                    queue[back++] = (BPlusTreeNode *)node->pointers[j];
-                    next_level_count++;
-                }
-            }
-
-            printed++;
+        if (node_level != current_level) {
+            if (current_level != -1)
+                strcat(buffer, " ");
+            char tmp[16];
+            sprintf(tmp, "L%d:", node_level);
+            strcat(buffer, tmp);
+            current_level = node_level;
         }
 
-        printf("\n");
+        strcat(buffer, "[");
+        for (int i = 0; i < node->num_keys; i++) {
+            char key_buf[16];
+            sprintf(key_buf, "%d", node->keys[i]);
+            strcat(buffer, key_buf);
+            if (i < node->num_keys - 1)
+                strcat(buffer, ",");
+        }
+        strcat(buffer, "]");
 
-        // Vai al livello successivo
-        nodes_in_level = next_level_count;
-        next_level_count = 0;
-        level++;
+        if (!node->is_leaf) {
+            for (int i = 0; i <= node->num_keys; i++) {
+                queue[back] = (BPlusTreeNode *)node->pointers[i];
+                level[back++] = node_level + 1;
+            }
+        }
     }
 
-    free(queue);
-    printf("--- end ---\n\n");
+    return buffer;
 }
 

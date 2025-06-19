@@ -22,6 +22,8 @@ BPlusTree *mm_bplustree_create(int order);
 
 void mm_bplustree_insert(BPlusTree *tree, int key);
 
-void mm_bplustree_print(BPlusTree *tree);
+int mm_bplustree_find(BPlusTree *tree, int key);
+
+char *mm_bplustree_to_string(BPlusTree *tree);
 
 #endif
